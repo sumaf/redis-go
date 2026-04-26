@@ -4,7 +4,23 @@ import (
 	"fmt"
 	"net"
 	"os"
+	//"sync"
 )
+
+func handleConnection(conn net.Conn) {
+	defer conn.Close()
+	buf := make([]byte, 1024)
+	
+	for {
+		_ , err := conn.Read(buf)
+		if err != nil {
+			break
+		}
+		conn.Write([]byte("+PONG\r\n"))
+	}
+}
+
+
 
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -17,18 +33,15 @@ func main() {
 		os.Exit(1)
 	}
 	
-	conn, err := listener.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
+	//var wg sync.WaitGroup 
+
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
+		}
+		go handleConnection(conn)
 	}
 
-	buf := make([]byte, 1024)
-	for {
-		_ , err := conn.Read(buf)
-		if err != nil {
-			break
-		}
-		conn.Write([]byte("+PONG\r\n"))
-	}
 }
