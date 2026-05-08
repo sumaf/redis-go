@@ -1,4 +1,4 @@
-package internal 
+package resp 
 
 import (
 	"fmt"
@@ -9,6 +9,9 @@ import (
 
 func Parsing(d []byte) (RESP, int, error) {
 	
+	if len(d) == 0 {
+		return RESP{}, 0, errors.New("incomplete")
+	}
 	control:= d[0]
 	switch control {
 		case '$': return parseBulk(d);
@@ -42,7 +45,7 @@ func parseArray(d []byte) (RESP, int, error) {
 		return RESP{}, 0, err
 	}
 	if length == -1 {
-		return RESP{'*', []string{}, d, -1}, header+2, err
+		return RESP{'*', nil, d[:header],-1}, 0, nil
 	}
 
 	var Data []string
@@ -62,7 +65,7 @@ func parseArray(d []byte) (RESP, int, error) {
 		values = values[consumed:]
 	}
 
-	return RESP{'*', Data, d, length}, total, nil
+	return RESP{'*', Data, d[:total], length}, total, nil
 }
 
 func parseSimpleString(d []byte) (RESP, int, error) {
@@ -85,13 +88,15 @@ func parseBulk(d []byte) (RESP, int, error) {
 		return RESP{}, 0, err
 	}
 	if length == -1 {
-		return RESP{'$', []string{}, d, -1}, header+2, err
+		return RESP{'$', nil, d[:header+2], -1}, header+2, err
 	}
 
-	rawSize := header + 2 + length + 2
+	total := header + 2 + length + 2
+	if len(d) < total {
+		return RESP{}, 0, errors.New("incomplete")
+	}
 
-
-	return RESP{'$', []string{string(d[header+2:header+2+length])}, d[:rawSize], length}, rawSize, err
+	return RESP{'$', []string{string(d[header+2:header+2+length])}, d[:total], length}, total, err
 }
 
 // Returns index of the header end
