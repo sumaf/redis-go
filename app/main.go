@@ -4,27 +4,51 @@ import (
 	"fmt"
 	"net"
 	"os"
+	//"bufio"
+	"github.com/codecrafters-io/redis-starter-go/internal"
 	//"sync"
 )
 
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
-	buf := make([]byte, 1024)
 	
+	// Stop using the bufio.Reader for now and use byte buffers instead
+	//reader := bufio.NewReader(conn)
+	
+	buf := make([]byte,0,4096)
+
 	for {
-		_ , err := conn.Read(buf)
+		tmp := make([]byte, 1024)
+		n, err := conn.Read(tmp)
 		if err != nil {
-			break
+			return
 		}
-		conn.Write([]byte("+PONG\r\n"))
+
+		buf = append(buf, tmp[:n]...)
+
+
+		for {
+			resp, consumed, err := Parsing(buf)
+			if err != nil {
+				if err.Error() == "incomplete" {
+					break
+				}
+				fmt.Println("failed to parse:", err)
+				return
+			}
+
+			buf = buf[consumed:]
+			Dispatch(resp)
+		}
+
+
+
 	}
 }
 
 
 
 func main() {
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	// fmt.Println("Logs from your program will appear here!")
 
 	listener, err := net.Listen("tcp", "0.0.0.0:6379")
 	
@@ -39,9 +63,11 @@ func main() {
 		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
-			os.Exit(1)
+			continue
 		}
 		go handleConnection(conn)
 	}
 
 }
+
+
