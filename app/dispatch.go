@@ -6,5 +6,6 @@ import (
 
 
 func Dispatch(resp RESP) {
+	switch
 	return
 }
