@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 	//"bufio"
-	"github.com/codecrafters-io/redis-starter-go/internal"
+	"github.com/sumaf/redis-go/internal"
 	//"sync"
 )
 
@@ -40,9 +40,6 @@ func handleConnection(conn net.Conn) {
 			buf = buf[consumed:]
 			Dispatch(resp)
 		}
-
-
-
 	}
 }
 
