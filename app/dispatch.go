@@ -1,6 +1,6 @@
 package main
 import (
-	"github.com/sumaf/redis-go/internal"
+	//"github.com/sumaf/redis-go/internal"
 	"net"
 	"strings"
 )
@@ -12,9 +12,8 @@ func Dispatch(r RESP, conn net.Conn) {
 		case "ping":
 			conn.Write([]byte("PONG"))
 		case "echo":
-			conn.Write(r.Data[1])
+			conn.Write([]byte(r.Data[1]))
 		default:
-			conn.Write("Unknown command: " + string(r.Data[0]))
+			conn.Write([]byte("Unknown command: " + string(r.Data[0])))
 	}
-	return
 }

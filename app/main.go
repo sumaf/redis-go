@@ -6,8 +6,7 @@ import (
 	"os"
 	//"bufio"
 	//"sync"
-
-	"github.com/sumaf/redis-go/internal/resp"
+	//"github.com/sumaf/redis-go/internal"
 )
 
 func handleConnection(conn net.Conn) {
