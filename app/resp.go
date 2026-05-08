@@ -18,8 +18,10 @@ func AppendPrefix(s []byte, p byte, n int64) []byte {
 	return append(s,'\r','\n')
 }
 
-func AppendString (s []byte) []byte {
-	return nil
+func AppendString (s []byte, simple string) []byte {
+	s = append(s, '+') 
+	s = append(s, simple...) 
+	return append(s, '\r', '\n')
 }
 
 func AppendBulkString (s []byte, bulk string) []byte {
