@@ -51,7 +51,6 @@ func main() {
 		os.Exit(1)
 	}
 
-
 	store := NewStore()
 	for {
 		conn, err := listener.Accept()
