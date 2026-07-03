@@ -20,8 +20,13 @@ const (
 	respnil = '_'
 )
 
-func GetSimpleString(simple string) []byte {
+func GetString(simple string) []byte {
 	s := append([]byte{respstr}, simple...)
+	return append(s, '\r', '\n')
+}
+
+func GetError(err string) []byte {
+	s := append([]byte{resperr}, "ERR " + err...)
 	return append(s, '\r', '\n')
 }
 
